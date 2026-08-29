@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Agri Platform — Mockup</title>
+  <link rel="stylesheet" href="/mockup.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="brand">AgriPlatform</div>
+    <ul class="menu">
+      <li data-section="home" class="active">Home</li>
+      <li data-section="ads">Ads</li>
+      <li data-section="services">Services</li>
+      <li data-section="map">Map</li>
+      <li data-section="profile">Profile</li>
+    </ul>
+    <div class="auth" id="authArea">
+      <button id="btnShowLogin" class="auth-btn">Login</button>
+      <button id="btnShowRegister" class="auth-btn outline">Register</button>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section id="home" class="section visible">
+      <h1>Welcome to AgriPlatform</h1>
+      <p>Connect buyers, suppliers, institutions and services in one place.</p>
+      <div class="cards">
+        <article class="card">
+          <h3>Quick Ads</h3>
+          <p>Browse recent buy/sell requests.</p>
+        </article>
+        <article class="card">
+          <h3>Services</h3>
+          <p>Find labs, consultants and equipment rental.</p>
+        </article>
+        <article class="card">
+          <h3>Map</h3>
+          <p>Locate suppliers and institutions nearby.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="ads" class="section">
+      <h2>Ads</h2>
+      <div class="filters">
+        <input placeholder="Search crop, variety, region" />
+        <select><option value="">All</option><option>Sell</option><option>Buy</option></select>
+      </div>
+      <div class="list">
+        <article class="item">
+          <div class="left"><strong>Buy sunflower seeds — 50 tons</strong><div class="meta">Saratov region • Buy</div></div>
+          <div class="right">Contact • <span class="price">—</span></div>
+        </article>
+        <article class="item">
+          <div class="left"><strong>Sell wheat seeds — Variety A</strong><div class="meta">Volgograd region • Sell</div></div>
+          <div class="right">Price: <span class="price">$3.50/kg</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="services" class="section">
+      <h2>Services</h2>
+      <div class="list">
+        <article class="service">
+          <h3>Agrochemical soil analysis</h3>
+          <div class="meta">Institution X — Saratov Oblast</div>
+          <p>Cost: $50 — Completion: 3 days — Contact: +7 900 000 0000</p>
+        </article>
+        <article class="service">
+          <h3>Seed testing (viability)</h3>
+          <div class="meta">Lab Y — Rostov</div>
+          <p>Cost: $30 — Completion: 2 days — Contact: lab@example.com</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="map" class="section">
+      <h2>Map</h2>
+      <div class="map-placeholder">Map placeholder — pins for Suppliers / Buyers / Services</div>
+    </section>
+
+    <section id="profile" class="section">
+      <h2>Organization Profile</h2>
+      <div class="profile">
+        <div class="profile-left">
+          <h3>Farm Coop "Greenfields"</h3>
+          <div class="meta">Supplier — Saratov region</div>
+          <p>What we do: Sell seeds, grain and fertilizer.</p>
+        </div>
+        <div class="profile-right">
+          <div class="rating">★★★★★ <small>4.7 (52 reviews)</small></div>
+          <button>Contact</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/mockup.js"></script>
+  
+  <!-- Auth modals -->
+  <div id="overlay" class="overlay" style="display:none"></div>
+  <div id="loginModal" class="modal" style="display:none">
+    <h3>Login</h3>
+    <input id="loginEmailMock" placeholder="Email" />
+    <input id="loginPassMock" placeholder="Password" type="password" />
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="loginSubmit">Sign in</button>
+      <button id="loginCancel" class="outline">Cancel</button>
+    </div>
+  </div>
+
+  <div id="registerModal" class="modal" style="display:none">
+    <h3>Register</h3>
+    <input id="regNameMock" placeholder="Name" />
+    <input id="regEmailMock" placeholder="Email" />
+    <input id="regPassMock" placeholder="Password" type="password" />
+    <select id="regRoleMock"><option value="farmer">Farmer</option><option value="company">Company</option><option value="institution">Institution</option><option value="other">Other</option></select>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="regSubmit">Create account</button>
+      <button id="regCancel" class="outline">Cancel</button>
+    </div>
+  </div>
+
+</body>
+</html>

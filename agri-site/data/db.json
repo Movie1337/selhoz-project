@@ -1,0 +1,21 @@
+{
+  "users": [
+    {
+      "id": "8e56455c-aec1-4687-91a6-ca8135b965fd",
+      "name": "Matthew ",
+      "email": "oldmooovie",
+      "passwordHash": "$2a$10$VqJSAim5/hvKAxpeJQKZ7OOPpVsxDtj3.OqCWxtM88rXCxWzPau/2",
+      "role": "farmer",
+      "createdAt": "2026-08-29T14:33:47.142Z"
+    },
+    {
+      "id": "f6a0dd6c-be19-4ee6-8c3a-5f96f3db5df4",
+      "name": "Matthew",
+      "email": "oldmooovie@gmail.com",
+      "passwordHash": "$2a$10$W2edQv3aPFLCIU6K/423durYVg0isSZueawcBl6qyG0dv/gyXFK8m",
+      "role": "farmer",
+      "createdAt": "2026-08-29T14:35:58.516Z"
+    }
+  ],
+  "ads": []
+}
