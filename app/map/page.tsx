@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { load } from "@2gis/mapgl";
 import { Layers, MapPin, Search, LocateFixed, X } from "lucide-react";
 import { organizations } from "@/lib/data";
+import Link from "next/link";
 
 type Org = (typeof organizations)[number];
 
@@ -282,40 +283,80 @@ export default function MapPage() {
           )}
 
           {selected && (
-            <div
-              className="card"
-              style={{
-                position: "absolute",
-                left: 18,
-                bottom: 18,
-                width: 320,
-                maxWidth: "calc(100% - 36px)",
-                padding: 18,
-                zIndex: 5,
-                background: "rgba(255,255,255,.97)",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-                <div>
-                  <div className="muted" style={{ fontSize: 12 }}>
-                    {selected.type}
-                  </div>
-                  <h3 style={{ margin: "5px 0 7px" }}>{selected.name}</h3>
-                  <div className="muted" style={{ fontSize: 13 }}>
-                    <MapPin size={13} style={{ verticalAlign: "-2px" }} /> {selected.region}
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelected(null)}
-                  aria-label="Закрыть"
-                  style={{ border: 0, background: "transparent", cursor: "pointer", height: 28 }}
-                >
-                  <X size={17} />
-                </button>
-              </div>
-              <div style={{ marginTop: 12, fontWeight: 800 }}>★ {selected.rating} рейтинг</div>
-            </div>
-          )}
+  <div
+    className="card"
+    style={{
+      position: "absolute",
+      left: 18,
+      bottom: 18,
+      width: 340,
+      maxWidth: "calc(100% - 36px)",
+      padding: 18,
+      zIndex: 5,
+      background: "rgba(255,255,255,.97)",
+    }}
+  >
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+      <div>
+        <div style={{ fontSize: 12, color: typeColors[selected.type], fontWeight: 800 }}>
+          ● {selected.type} {selected.verified ? "· ПРОВЕРЕНО" : ""}
+        </div>
+
+        <h3 style={{ margin: "6px 0 7px" }}>{selected.name}</h3>
+
+        <div className="muted" style={{ fontSize: 13 }}>
+          <MapPin size={13} style={{ verticalAlign: "-2px" }} /> {selected.region}
+        </div>
+      </div>
+
+      <button
+        onClick={() => setSelected(null)}
+        aria-label="Закрыть"
+        style={{ border: 0, background: "transparent", cursor: "pointer", height: 28 }}
+      >
+        <X size={17} />
+      </button>
+    </div>
+
+    <div style={{ marginTop: 12, fontWeight: 800 }}>
+      ★ {selected.rating} · {selected.reviews} отзывов
+    </div>
+
+    <div style={{ marginTop: 12, fontSize: 13, fontWeight: 800 }}>
+      {selected.type === "Покупатель" ? "Покупает:" : "Предлагает:"}
+    </div>
+
+    <div className="muted" style={{ fontSize: 13, lineHeight: 1.6, marginTop: 4 }}>
+      {selected.offers.map((offer) => (
+        <div key={offer}>• {offer}</div>
+      ))}
+    </div>
+
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
+      <Link className="btn btn-secondary" href="/organizations">
+        Подробнее
+      </Link>
+
+      <a
+        className="btn btn-primary"
+        href={`mailto:support@agromost.ru?subject=${encodeURIComponent(
+          `Запрос для ${selected.name}`
+        )}`}
+      >
+        Связаться
+      </a>
+
+      <a
+        className="btn btn-secondary"
+        target="_blank"
+        rel="noreferrer"
+        href={`https://www.google.com/maps/dir/?api=1&destination=${selected.coordinates[1]},${selected.coordinates[0]}`}
+      >
+        Маршрут
+      </a>
+    </div>
+  </div>
+)}
         </div>
 
         <aside
