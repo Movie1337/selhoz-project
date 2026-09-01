@@ -9,31 +9,60 @@ type Org = (typeof organizations)[number];
 
 const MAP_CENTER: [number, number] = [46.0342, 51.5336];
 
+const typeColors: Record<string, string> = {
+  Поставщик: "#2f9e44",
+  Покупатель: "#1971c2",
+  Услуги: "#e67700",
+  Учреждение: "#8e44ad",
+};
+
 export default function MapPage() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("Все");
+  const [region, setRegion] = useState("Все регионы");
+  const [category, setCategory] = useState("Все категории");
+  const [minRating, setMinRating] = useState("0");
+  const [onlyVerified, setOnlyVerified] = useState(false);
+
   const [selected, setSelected] = useState<Org | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState("");
 
   const filters = ["Все", "Поставщик", "Покупатель", "Услуги", "Учреждение"];
+  const regions = ["Все регионы", ...Array.from(new Set(organizations.map((o) => o.region)))];
+  const categories = [
+    "Все категории",
+    ...Array.from(new Set(organizations.map((o) => o.category))),
+  ];
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return organizations.filter((o) => {
-      const matchesFilter = filter === "Все" || o.type === filter;
-      const matchesQuery =
-        !q ||
-        o.name.toLowerCase().includes(q) ||
-        o.region.toLowerCase().includes(q) ||
-        o.type.toLowerCase().includes(q);
-      return matchesFilter && matchesQuery;
-    });
-  }, [query, filter]);
 
+    return organizations.filter((o) => {
+      const searchText = [
+        o.name,
+        o.region,
+        o.type,
+        o.category,
+        ...o.offers,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return (
+        (filter === "Все" || o.type === filter) &&
+        (region === "Все регионы" || o.region === region) &&
+        (category === "Все категории" || o.category === category) &&
+        o.rating >= Number(minRating) &&
+        (!onlyVerified || o.verified) &&
+        (!q || searchText.includes(q))
+      );
+    });
+  }, [query, filter, region, category, minRating, onlyVerified]);
   useEffect(() => {
     let destroyed = false;
 
@@ -272,70 +301,154 @@ export default function MapPage() {
         </div>
 
         <aside
-          style={{
-            background: "#fff",
-            borderLeft: "1px solid var(--line)",
-            padding: 18,
-            overflowY: "auto",
-            maxHeight: 650,
-          }}
-        >
-          <div style={{ display: "flex", gap: 7, flexWrap: "wrap", marginBottom: 15 }}>
-            {filters.map((item) => (
-              <button
-                key={item}
-                className="pill"
-                onClick={() => setFilter(item)}
-                style={{
-                  border: 0,
-                  cursor: "pointer",
-                  background: filter === item ? "var(--green)" : "#f1f4ee",
-                  color: filter === item ? "#fff" : "var(--ink)",
-                }}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
+  style={{
+    background: "#fff",
+    borderLeft: "1px solid var(--line)",
+    padding: 18,
+    overflowY: "auto",
+    maxHeight: 650,
+  }}
+>
+  <div style={{ display: "flex", gap: 7, flexWrap: "wrap", marginBottom: 16 }}>
+    {filters.map((item) => (
+      <button
+        key={item}
+        className="pill"
+        onClick={() => setFilter(item)}
+        style={{
+          border: 0,
+          cursor: "pointer",
+          background: filter === item ? "var(--green)" : "#f1f4ee",
+          color: filter === item ? "#fff" : "var(--ink)",
+        }}
+      >
+        {item}
+      </button>
+    ))}
+  </div>
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div className="muted" style={{ fontSize: 12 }}>
-              {filtered.length} из {organizations.length} объектов
-            </div>
-            <Layers size={16} className="muted" />
-          </div>
+  <div style={{ display: "grid", gap: 9, marginBottom: 16 }}>
+    <select
+      className="input"
+      value={region}
+      onChange={(e) => setRegion(e.target.value)}
+    >
+      {regions.map((item) => (
+        <option key={item}>{item}</option>
+      ))}
+    </select>
 
-          {filtered.map((o) => (
-            <button
-              key={o.name}
-              onClick={() => focusOrganization(o)}
-              style={{
-                width: "100%",
-                textAlign: "left",
-                padding: "14px 0",
-                border: 0,
-                borderBottom: "1px solid var(--line)",
-                background: "transparent",
-                cursor: "pointer",
-                color: "inherit",
-              }}
-            >
-              <b>{o.name}</b>
-              <div className="muted" style={{ fontSize: 13, marginTop: 5 }}>
-                <MapPin size={13} style={{ verticalAlign: "-2px" }} /> {o.region}
-              </div>
-              <div style={{ fontSize: 13, marginTop: 5 }}>
-                ★ {o.rating} · {o.type}
-              </div>
-            </button>
-          ))}
+    <select
+      className="input"
+      value={category}
+      onChange={(e) => setCategory(e.target.value)}
+    >
+      {categories.map((item) => (
+        <option key={item}>{item}</option>
+      ))}
+    </select>
 
-          {filtered.length === 0 && (
-            <div className="muted" style={{ padding: "30px 0", textAlign: "center", fontSize: 14 }}>
-              Ничего не найдено.
-            </div>
-          )}
-        </aside>
+    <select
+      className="input"
+      value={minRating}
+      onChange={(e) => setMinRating(e.target.value)}
+    >
+      <option value="0">Любой рейтинг</option>
+      <option value="4">Рейтинг от 4.0</option>
+      <option value="4.5">Рейтинг от 4.5</option>
+      <option value="4.8">Рейтинг от 4.8</option>
+    </select>
+
+    <label
+      style={{
+        display: "flex",
+        gap: 8,
+        alignItems: "center",
+        fontSize: 13,
+        cursor: "pointer",
+      }}
+    >
+      <input
+        type="checkbox"
+        checked={onlyVerified}
+        onChange={(e) => setOnlyVerified(e.target.checked)}
+      />
+      Только проверенные
+    </label>
+  </div>
+
+  <div
+    style={{
+      padding: "12px 0",
+      borderTop: "1px solid var(--line)",
+      borderBottom: "1px solid var(--line)",
+      marginBottom: 8,
+      fontSize: 12,
+    }}
+  >
+    <div className="muted" style={{ marginBottom: 8 }}>
+      {filtered.length} из {organizations.length} объектов
+    </div>
+
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      {Object.entries(typeColors).map(([type, color]) => (
+        <span key={type} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              background: color,
+              display: "inline-block",
+            }}
+          />
+          {type}
+        </span>
+      ))}
+    </div>
+  </div>
+
+  {filtered.map((o) => (
+    <button
+      key={o.name}
+      onClick={() => focusOrganization(o)}
+      style={{
+        width: "100%",
+        textAlign: "left",
+        padding: "14px 0",
+        border: 0,
+        borderBottom: "1px solid var(--line)",
+        background: "transparent",
+        cursor: "pointer",
+        color: "inherit",
+      }}
+    >
+      <b>{o.name}</b>
+
+      <div style={{ fontSize: 13, marginTop: 6, color: typeColors[o.type] }}>
+        ● {o.type} {o.verified ? "· Проверено" : ""}
+      </div>
+
+      <div className="muted" style={{ fontSize: 13, marginTop: 5 }}>
+        <MapPin size={13} style={{ verticalAlign: "-2px" }} /> {o.region}
+      </div>
+
+      <div style={{ fontSize: 13, marginTop: 5 }}>
+        ★ {o.rating} · {o.reviews} отзывов
+      </div>
+
+      <div className="muted" style={{ fontSize: 13, marginTop: 5 }}>
+        {o.category}
+      </div>
+    </button>
+  ))}
+
+  {filtered.length === 0 && (
+    <div className="muted" style={{ padding: "30px 0", textAlign: "center", fontSize: 14 }}>
+      Ничего не найдено.
+    </div>
+  )}
+</aside>
       </div>
     </main>
   );
