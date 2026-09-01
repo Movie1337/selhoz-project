@@ -16,8 +16,8 @@ const typeColors: Record<string, string> = {
   Услуги: "#e67700",
   Учреждение: "#8e44ad",
 };
-function markerIcon(type: string) {
-  const color = typeColors[type] ?? "#1971c2";
+function markerIcon(type: string, customColor?: string) {
+ const color = customColor ?? typeColors[type] ?? "#1971c2";
 
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="38" height="48" viewBox="0 0 38 48">
@@ -37,6 +37,7 @@ export default function MapPage() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+const userMarkerRef = useRef<any>(null);
 
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("Все");
@@ -190,6 +191,43 @@ const buildRoute = (org: Org) => {
     }
   );
 };
+const locateUser = () => {
+  if (!navigator.geolocation) {
+    alert("Ваш браузер не поддерживает геолокацию.");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const map = mapRef.current;
+      const mapgl = (map as any)?.__mapgl;
+
+      if (!map || !mapgl) return;
+
+      const coordinates: [number, number] = [
+        position.coords.longitude,
+        position.coords.latitude,
+      ];
+
+      userMarkerRef.current?.destroy?.();
+
+      userMarkerRef.current = new mapgl.Marker(map, {
+        coordinates,
+        icon: markerIcon("Покупатель", "#e03131"),
+        size: [38, 48],
+        anchor: [19, 47],
+      });
+
+      map.setCenter(coordinates);
+      map.setZoom(12);
+
+      alert("Вы здесь. Карта приближена к вашему местоположению.");
+    },
+    () => {
+      alert("Не удалось определить местоположение. Разрешите геолокацию в браузере.");
+    }
+  );
+};
   const focusOrganization = (org: Org) => {
     if (!mapRef.current || !org.coordinates) return;
     setSelected(org);
@@ -238,6 +276,9 @@ const buildRoute = (org: Org) => {
     ☷ Список
   </button>
 
+<button className="btn btn-secondary" onClick={locateUser}>
+  <LocateFixed size={17} /> Найти меня
+</button>
   <button className="btn btn-secondary" onClick={resetMap}>
     <LocateFixed size={17} /> Вся Россия
   </button>
