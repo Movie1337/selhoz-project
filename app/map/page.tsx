@@ -33,6 +33,24 @@ function markerIcon(type: string, customColor?: string) {
 
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
+function distanceKm(
+  from: [number, number],
+  to: [number, number]
+) {
+  const radius = 6371;
+  const toRadians = (value: number) => (value * Math.PI) / 180;
+
+  const latDiff = toRadians(to[1] - from[1]);
+  const lonDiff = toRadians(to[0] - from[0]);
+
+  const a =
+    Math.sin(latDiff / 2) ** 2 +
+    Math.cos(toRadians(from[1])) *
+      Math.cos(toRadians(to[1])) *
+      Math.sin(lonDiff / 2) ** 2;
+
+  return radius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 export default function MapPage() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
@@ -45,6 +63,8 @@ const userMarkerRef = useRef<any>(null);
   const [category, setCategory] = useState("Все категории");
   const [minRating, setMinRating] = useState("0");
   const [onlyVerified, setOnlyVerified] = useState(false);
+const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
+const [distanceLimit, setDistanceLimit] = useState("all");
 
   const [selected, setSelected] = useState<Org | null>(null);
   const [mapReady, setMapReady] = useState(false);
@@ -78,10 +98,13 @@ const userMarkerRef = useRef<any>(null);
         (category === "Все категории" || o.category === category) &&
         o.rating >= Number(minRating) &&
         (!onlyVerified || o.verified) &&
+        (distanceLimit === "all" ||
+  (userCoordinates !== null &&
+    distanceKm(userCoordinates, o.coordinates) <= Number(distanceLimit))) &&
         (!q || searchText.includes(q))
       );
     });
-  }, [query, filter, region, category, minRating, onlyVerified]);
+  }, [query, filter, region, category, minRating, onlyVerified, userCoordinates, distanceLimit]);
   useEffect(() => {
     let destroyed = false;
 
@@ -209,6 +232,7 @@ const locateUser = () => {
         position.coords.latitude,
       ];
 
+      setUserCoordinates(coordinates);
       userMarkerRef.current?.destroy?.();
 
       userMarkerRef.current = new mapgl.Marker(map, {
@@ -471,6 +495,19 @@ const locateUser = () => {
         <option key={item}>{item}</option>
       ))}
     </select>
+<select
+  className="input"
+  value={distanceLimit}
+  disabled={!userCoordinates}
+  onChange={(e) => setDistanceLimit(e.target.value)}
+>
+  <option value="all">
+    {userCoordinates ? "Любое расстояние" : "Сначала нажмите «Найти меня»"}
+  </option>
+  <option value="5">Рядом: до 5 км</option>
+  <option value="20">Рядом: до 20 км</option>
+  <option value="50">Рядом: до 50 км</option>
+</select>
 
     <select
       className="input"
