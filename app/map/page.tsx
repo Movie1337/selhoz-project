@@ -47,6 +47,7 @@ export default function MapPage() {
 
   const [selected, setSelected] = useState<Org | null>(null);
   const [mapReady, setMapReady] = useState(false);
+ const [viewMode, setViewMode] = useState<"map" | "list">("map");
   const [mapError, setMapError] = useState("");
 
   const filters = ["Все", "Поставщик", "Покупатель", "Услуги", "Учреждение"];
@@ -169,7 +170,26 @@ export default function MapPage() {
       markersRef.current = [];
     };
   }, [filtered, mapReady]);
+const buildRoute = (org: Org) => {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const from = `${position.coords.longitude},${position.coords.latitude}`;
+      const to = `${org.coordinates[0]},${org.coordinates[1]}`;
 
+      const fromPoint = `${from}%E2%95%8E%E2%95%8E`;
+      const toPoint = `${to}%E2%95%8E%E2%95%8E`;
+
+      window.open(
+        `https://2gis.ru/saratov/routeSearch/rsType/car/from/${fromPoint}/to/${toPoint}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    },
+    () => {
+      alert("Разреши геолокацию в браузере, чтобы построить маршрут.");
+    }
+  );
+};
   const focusOrganization = (org: Org) => {
     if (!mapRef.current || !org.coordinates) return;
     setSelected(org);
@@ -203,16 +223,32 @@ export default function MapPage() {
             Реальная карта 2ГИС с организациями АгроМоста.
           </p>
         </div>
-        <button className="btn btn-secondary" onClick={resetMap}>
-          <LocateFixed size={17} /> Вся Россия
-        </button>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+  <button
+    className={viewMode === "map" ? "btn btn-primary" : "btn btn-secondary"}
+    onClick={() => setViewMode("map")}
+  >
+    🗺 Карта
+  </button>
+
+  <button
+    className={viewMode === "list" ? "btn btn-primary" : "btn btn-secondary"}
+    onClick={() => setViewMode("list")}
+  >
+    ☷ Список
+  </button>
+
+  <button className="btn btn-secondary" onClick={resetMap}>
+    <LocateFixed size={17} /> Вся Россия
+  </button>
+</div>
       </div>
 
       <div
         className="card"
         style={{
           overflow: "hidden",
-          display: "grid",
+          display: viewMode === "map" ? "grid" : "none",
           gridTemplateColumns: "1fr 340px",
           minHeight: 650,
         }}
@@ -346,14 +382,12 @@ export default function MapPage() {
         Связаться
       </a>
 
-      <a
-        className="btn btn-secondary"
-        target="_blank"
-        rel="noreferrer"
-        href={`https://www.google.com/maps/dir/?api=1&destination=${selected.coordinates[1]},${selected.coordinates[0]}`}
-      >
-        Маршрут
-      </a>
+      <button
+  className="btn btn-secondary"
+  onClick={() => buildRoute(selected)}
+>
+  Маршрут
+</button>
     </div>
   </div>
 )}
@@ -509,6 +543,106 @@ export default function MapPage() {
   )}
 </aside>
       </div>
+      {viewMode === "list" && (
+  <section>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 16,
+        margin: "10px 0 20px",
+      }}
+    >
+      <div>
+        <h2 style={{ margin: 0 }}>Все участники</h2>
+        <p className="muted" style={{ margin: "6px 0 0" }}>
+          Найдено: {filtered.length}
+        </p>
+      </div>
+    </div>
+
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+      {filtered.map((o) => (
+        <article className="card" key={o.name} style={{ padding: 20 }}>
+          <div
+            style={{
+              color: typeColors[o.type],
+              fontSize: 13,
+              fontWeight: 800,
+              marginBottom: 8,
+            }}
+          >
+            ● {o.type} {o.verified ? "· ПРОВЕРЕНО" : ""}
+          </div>
+
+          <h3 style={{ margin: "0 0 8px" }}>{o.name}</h3>
+
+          <div className="muted" style={{ fontSize: 14 }}>
+            <MapPin size={14} style={{ verticalAlign: "-2px" }} /> {o.region}
+          </div>
+
+          <div style={{ marginTop: 10, fontWeight: 800 }}>
+            ★ {o.rating} · {o.reviews} отзывов
+          </div>
+
+          <div className="muted" style={{ marginTop: 10, fontSize: 14 }}>
+            <b>{o.category}</b>
+            <br />
+            {o.offers.slice(0, 2).join(" · ")}
+          </div>
+
+          <button
+            className="btn btn-secondary"
+            style={{ marginTop: 18, width: "100%" }}
+            onClick={() => {
+              setViewMode("map");
+              focusOrganization(o);
+            }}
+          >
+            Показать на карте
+          </button>
+        </article>
+      ))}
+    </div>
+
+    {filtered.length === 0 && (
+      <div className="card muted" style={{ padding: 30, textAlign: "center" }}>
+        По выбранным фильтрам ничего не найдено.
+      </div>
+    )}
+  </section>
+)}
+    <section
+  className="card"
+  style={{
+    marginTop: 32,
+    padding: "32px 28px",
+    background: "#eaf3e5",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 20,
+    flexWrap: "wrap",
+  }}
+>
+  <div>
+    <div className="muted" style={{ fontSize: 13, fontWeight: 800 }}>
+      ДЛЯ УЧАСТНИКОВ РЫНКА
+    </div>
+
+    <h2 style={{ margin: "7px 0 8px" }}>Не нашли нужную организацию?</h2>
+
+    <p className="muted" style={{ margin: 0, maxWidth: 650 }}>
+      Разместите свою организацию на АгроМосте и расскажите потенциальным
+      клиентам о товарах и услугах.
+    </p>
+  </div>
+
+  <Link className="btn btn-primary" href="/dashboard">
+    Добавить организацию
+  </Link>
+</section>
     </main>
   );
 }
