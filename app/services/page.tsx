@@ -1,0 +1,9 @@
+import { services } from "@/lib/data";
+import { CheckCircle2, Search, Star } from "lucide-react";
+export default function Services() {
+ return <main className="container" style={{padding:"45px 0 70px"}}>
+  <div style={{maxWidth:720}}><div className="muted" style={{fontSize:13,fontWeight:800}}>КАТАЛОГ</div><h1 style={{fontSize:42,margin:"7px 0"}}>Услуги</h1><p className="muted">Лаборатории, консультации, обработка полей, аренда техники и другие услуги аграрных организаций.</p></div>
+  <div className="card" style={{padding:14,display:"grid",gridTemplateColumns:"2fr 1fr 1fr",gap:10,margin:"25px 0"}}><div style={{position:"relative"}}><Search size={17} style={{position:"absolute",left:13,top:15,color:"#7b897d"}}/><input className="input" style={{paddingLeft:40}} placeholder="Найти услугу или организацию"/></div><select className="input"><option>Все категории</option><option>Анализ почвы</option><option>Анализ семян</option><option>Обработка полей</option></select><select className="input"><option>Все регионы</option><option>Саратовская область</option></select></div>
+  <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:18}}>{services.map(s=><article className="card" style={{padding:24}} key={s.id}><span className="pill" style={{background:"#eef5ec",color:"var(--green)"}}>{s.category}</span><h2 style={{fontSize:21,margin:"17px 0 9px"}}>{s.title}</h2><div style={{fontWeight:800}}>{s.organization} {s.verified&&<CheckCircle2 size={15} color="var(--green)" style={{verticalAlign:"-2px"}}/>}</div><p className="muted" style={{margin:"12px 0"}}>{s.region}</p><div style={{display:"flex",justifyContent:"space-between",paddingTop:15,borderTop:"1px solid var(--line)"}}><b>{s.price}</b><span className="muted">{s.term}</span></div><div style={{marginTop:14,fontSize:13}}><Star size={14} fill="currentColor" style={{verticalAlign:"-2px"}}/> {s.rating} · {s.reviews} отзывов</div></article>)}</div>
+ </main>;
+}
