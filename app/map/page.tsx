@@ -15,7 +15,23 @@ const typeColors: Record<string, string> = {
   Услуги: "#e67700",
   Учреждение: "#8e44ad",
 };
+function markerIcon(type: string) {
+  const color = typeColors[type] ?? "#1971c2";
 
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="38" height="48" viewBox="0 0 38 48">
+      <path
+        d="M19 1C9.6 1 2 8.6 2 18c0 12.8 17 29 17 29s17-16.2 17-29C36 8.6 28.4 1 19 1Z"
+        fill="${color}"
+        stroke="white"
+        stroke-width="3"
+      />
+      <circle cx="19" cy="18" r="6" fill="white" />
+    </svg>
+  `;
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
 export default function MapPage() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
@@ -131,11 +147,13 @@ export default function MapPage() {
     filtered.forEach((org) => {
       if (!org.coordinates) return;
 
-      const marker = new mapgl.Marker(map, {
-        coordinates: org.coordinates,
-        userData: org,
-      });
-
+     const marker = new mapgl.Marker(map, {
+  coordinates: org.coordinates,
+  icon: markerIcon(org.type),
+  size: [38, 48],
+  anchor: [19, 47],
+  userData: org,
+});
       marker.on("click", () => {
         setSelected(org);
         map.setCenter(org.coordinates);
