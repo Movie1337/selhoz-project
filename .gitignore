@@ -1,0 +1,9 @@
+node_modules/
+.next/
+out/
+build/
+*.log
+*.tsbuildinfo
+.env*
+!.env.example
+/selhoz-project-main/

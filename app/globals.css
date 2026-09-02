@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f7f8f2;
+  --surface: #ffffff;
+  --ink: #17351f;
+  --muted: #68766b;
+  --green: #285c36;
+  --green-dark: #1c4728;
+  --lime: #dceab4;
+  --line: #e2e8de;
+  --orange: #e98a3a;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font: inherit; }
+
+.container { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: 0 8px 30px rgba(23,53,31,.05);
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 13px;
+  border: 1px solid transparent;
+  font-weight: 800;
+  cursor: pointer;
+  transition: .18s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { background: var(--green); color: white; }
+.btn-primary:hover { background: var(--green-dark); }
+.btn-secondary { background: white; border-color: var(--line); color: var(--ink); }
+.btn-lime { background: var(--lime); color: var(--green-dark); }
+.input {
+  width: 100%;
+  height: 48px;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 13px;
+  padding: 0 14px;
+  outline: none;
+}
+.input:focus { border-color: #91ad85; box-shadow: 0 0 0 3px rgba(145,173,133,.16); }
+.muted { color: var(--muted); }
+.hero-grid {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(220,234,180,.8), transparent 30%),
+    radial-gradient(circle at 10% 90%, rgba(218,239,214,.9), transparent 30%);
+}
+.map-grid {
+  background-color: #edf3e8;
+  background-image:
+    linear-gradient(rgba(74,106,78,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74,106,78,.08) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+@media (max-width: 700px) {
+  .container { width: min(100% - 24px, 1180px); }
+}
