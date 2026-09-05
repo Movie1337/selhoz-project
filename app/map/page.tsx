@@ -638,7 +638,48 @@ const locateUser = () => {
         </p>
       </div>
     </div>
+<div
+  className="card"
+  style={{
+    padding: "12px 16px",
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 20,
+    background: "#fff",
+  }}
+>
+  <Search size={18} />
 
+  <input
+    value={query}
+    onChange={(e) => setQuery(e.target.value)}
+    placeholder="Поиск по организациям, регионам, товарам и услугам"
+    style={{
+      border: 0,
+      outline: 0,
+      width: "100%",
+      background: "transparent",
+      fontSize: 15,
+    }}
+  />
+
+  {query && (
+    <button
+      onClick={() => setQuery("")}
+      aria-label="Очистить поиск"
+      style={{
+        border: 0,
+        background: "transparent",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <X size={17} />
+    </button>
+  )}
+</div>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
       {filtered.map((o) => (
         <article className="card" key={o.name} style={{ padding: 20 }}>
